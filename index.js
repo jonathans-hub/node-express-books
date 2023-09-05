@@ -10,7 +10,7 @@ const BookSchema = new mongoose.Schema({
   description: String,
 })
 
-const bookModule = mongoose.model("books", BookSchema)
+const bookModel = mongoose.model("books", BookSchema)
 
 
 //controllers
@@ -18,18 +18,18 @@ const getBookscontroller = (req, res) => {
   const {param} = req.params
   if(param){
     let decodedParam = decodeURI(param)
-    bookModule.find({author: decodedParam}).then(result=>{
+    bookModel.find({author: decodedParam}).then(result=>{
       res.json({ data: result });
     }).catch(err=>console.error(err));
   }
-  else{bookModule.find().then(result=>{
+  else{bookModel.find().then(result=>{
     res.json({ data: result });
   }).catch(err=>console.error(err));}
 };
 
 const createBookscontroller = (req, res) => {
   const { title, author, description } = req.body;
-  const book = new bookModule({title, author, description});
+  const book = new bookModel({title, author, description});
   book.save().then(result=>{
     res.json({ message: "New book instance created", data: result });
 
@@ -37,12 +37,12 @@ const createBookscontroller = (req, res) => {
 };
 // const updateBookscontroller = (req, res) => {
 //   const { title, author, description } = req.body;
-//   const updatedBook = bookModule.update({ title, author, description });
+//   const updatedBook = bookModel.update({ title, author, description });
 //   res.json({ message: "Book has been updated", data: updatedBook });
 // };
 // const deleteBookscontroller = (req, res) => {
 //     const {title}=req.body
-//     const deletedBook= bookModule.delete({title})
+//     const deletedBook= bookModel.delete({title})
 //     res.json({ message: "Book has been deleted", data:deletedBook})
 // };
 
