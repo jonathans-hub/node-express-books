@@ -1,75 +1,63 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const mongoose = require('mongoose')
 
 const server = express();
 
-//database
-let booksDB = [];
+const BookSchema = new mongoose.Schema({
+  title :  String,
+  author: String,
+  description: String,
+})
 
-class bookModule {
-  constructor(title, author, description) {
-    this.title = title;
-    this.author = author;
-    this.description = description;
-  }
+const bookModule = mongoose.model("books", BookSchema)
 
-  save() {
-    booksDB.push(this);
-  }
-  static all() {
-    return booksDB;
-  }
-  static update(updateInfo = {}) {
-    booksDB = booksDB.map((book) => {
-      if (book.title === updateInfo.title) {
-        return (this.updatedBook = { ...book, ...updateInfo });
-      }
-      return book;
-    });
-    return this.updatedBook;
-  }
-  static delete({ title }) {
-    let deletedBook= null
-    booksDB = booksDB.filter((book) => {
-      if (book.title === title) {
-        deletedBook = book
-        return false;
-      }
-      return true;
-    });
-    return deletedBook;
-  }
-}
 
 //controllers
 const getBookscontroller = (req, res) => {
-  const books = bookModule.all();
-  res.json({ data: books });
+  const {param} = req.params
+  if(param){
+    let decodedParam = decodeURI(param)
+    bookModule.find({author: decodedParam}).then(result=>{
+      res.json({ data: result });
+    }).catch(err=>console.error(err));
+  }
+  else{bookModule.find().then(result=>{
+    res.json({ data: result });
+  }).catch(err=>console.error(err));}
 };
+
 const createBookscontroller = (req, res) => {
   const { title, author, description } = req.body;
-  const book = new bookModule(title, author, description);
-  book.save();
-  res.json({ message: "New book instance created", data: book });
+  const book = new bookModule({title, author, description});
+  book.save().then(result=>{
+    res.json({ message: "New book instance created", data: result });
+
+  })
 };
-const updateBookscontroller = (req, res) => {
-  const { title, author, description } = req.body;
-  const updatedBook = bookModule.update({ title, author, description });
-  res.json({ message: "Book has been updated", data: updatedBook });
-};
-const deleteBookscontroller = (req, res) => {
-    const {title}=req.body
-    const deletedBook= bookModule.delete({title})
-    res.json({ message: "Book has been deleted", data:deletedBook})
-};
+// const updateBookscontroller = (req, res) => {
+//   const { title, author, description } = req.body;
+//   const updatedBook = bookModule.update({ title, author, description });
+//   res.json({ message: "Book has been updated", data: updatedBook });
+// };
+// const deleteBookscontroller = (req, res) => {
+//     const {title}=req.body
+//     const deletedBook= bookModule.delete({title})
+//     res.json({ message: "Book has been deleted", data:deletedBook})
+// };
 
 //middlewares
 server.use(bodyParser.json());
 
 //routes
-server.get("/books", getBookscontroller);
+server.get("/books/:param?", getBookscontroller);
 server.post("/books", createBookscontroller);
-server.put("/books", updateBookscontroller);
-server.delete("/books", deleteBookscontroller);
+// server.put("/books", updateBookscontroller);
+// server.delete("/books", deleteBookscontroller);
 
-server.listen(3001, () => console.log("server is ready"));
+
+mongoose.connect("mongodb+srv://jonathan:asbqmDqKn2O9WXJw@cluster0.lir8ktj.mongodb.net/codetrain?retryWrites=true&w=majority").then(
+  result =>{  
+    server.listen(3001, () => console.log("server is ready"));
+  }
+).catch(err=>console.error(err))
