@@ -1,7 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
-const bankRoutes = require('./routes/book')
+const bookRoutes = require('./routes/book')
 const authorRoutes = require('./routes/author')
 
 const server = express();
@@ -11,7 +11,7 @@ server.use(bodyParser.json());
 
 
 //routes
-server.use(bankRoutes)
+server.use(bookRoutes)
 server.use(authorRoutes)
 
 
