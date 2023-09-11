@@ -1,29 +1,19 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
-const {
-  getBooksController,
-  createBookController,
-  updateBookController,
-  deleteBookController,
-  createAuthorController,
-  getAuthorsController,
-  deleteAuthorController,
-} = require("./controllers");
+const bankRoutes = require('./routes/book')
+const authorRoutes = require('./routes/author')
 
 const server = express();
 
 //middlewares
 server.use(bodyParser.json());
 
+
 //routes
-server.get("/books/:param?", getBooksController);
-server.post("/books", createBookController);
-server.put("/books", updateBookController);
-server.delete("/books", deleteBookController);
-server.post("/authors", createAuthorController);
-server.get("/authors/:param?", getAuthorsController);
-server.delete("/authors", deleteAuthorController);
+server.use(bankRoutes)
+server.use(authorRoutes)
+
 
 mongoose
   .connect(
